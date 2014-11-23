@@ -15,7 +15,7 @@ import os
 
 help_message = '''
 To use, fill out config.yml with your own participants. You can also specify 
-DONT-PAIR so that people don't get assigned their significant other.
+DONT_PAIR so that people don't get assigned their significant other.
 
 You'll also need to specify your mail server settings. An example is provided
 for routing mail through gmail.
@@ -30,7 +30,7 @@ REQRD = (
     'PASSWORD', 
     'TIMEZONE', 
     'PARTICIPANTS', 
-    'DONT-PAIR', 
+    'DONT_PAIR', 
     'FROM', 
     'SUBJECT', 
     'MESSAGE',
@@ -119,7 +119,7 @@ def main(argv=None):
                     'Required parameter %s not in yaml config file!' % (key,))
 
         participants = config['PARTICIPANTS']
-        dont_pair = config['DONT-PAIR']
+        dont_pair = config['DONT_PAIR']
         if len(participants) < 2:
             raise Exception('Not enough participants specified.')
         
