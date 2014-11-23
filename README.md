@@ -40,7 +40,7 @@ Here is the example configuration unchanged:
       - Sharon <Sharon@hi.org>
 
     # Warning -- if you mess this up you could get an infinite loop
-    DONT-PAIR:
+    DONT_PAIR:
       - Chad, Jen    # Chad and Jen are married
       - Chad, Bill   # Chad and Bill are best friends
       - Bill, Sharon
