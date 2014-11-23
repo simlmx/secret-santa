@@ -1,6 +1,6 @@
 from unittest import TestCase
 import os
-from secret_santa import parse_yaml
+from secret_santa import parse_yaml, choose_receiver, Person
 
 class TestSecretSanta(TestCase):
 
@@ -17,4 +17,30 @@ class TestSecretSanta(TestCase):
         self.assertTrue(parsed['FROM'])
         self.assertTrue(parsed['SMTP_SERVER'])
         self.assertTrue(parsed['USERNAME'])
+
+    def test_chooses_legitimate_receiver(self):
+        hans  = Person('Hans', 'hans@email.com', 'Uschi')
+        uschi = Person('Uschi', 'uschi@email.com', None)
+        frank = Person('Frank', 'frank@email.com', None)
         
+        receiver = choose_receiver(hans, [uschi, frank])
+
+        self.assertEqual(receiver, frank)
+        
+    def test_doesnt_always_choose_the_same_receiver(self):
+        hans  = Person('Hans',  'hans@email.com',  'None')
+        uschi = Person('Uschi', 'uschi@email.com', 'None')
+        frank = Person('Frank', 'frank@email.com', 'None')
+        
+        uschi_received = False
+        frank_received = False
+
+        for i in range(100):
+            receiver = choose_receiver(hans, [uschi, frank])
+            if receiver == uschi:
+                uschi_received = True
+            if receiver == frank:
+                frank_received = True
+
+        self.assertTrue(uschi_received, "Uschi never received anything.")
+        self.assertTrue(frank_received, "Frank never received anything.")

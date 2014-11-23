@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
-import yaml
-# sudo pip install pyyaml
+import yaml # sudo pip install pyyaml
 import re
 import random
 import smtplib
