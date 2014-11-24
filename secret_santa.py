@@ -47,10 +47,10 @@ Subject: {subject}
 CONFIG_PATH = os.path.join(os.path.dirname(__file__), 'config.yml')
 
 class Person:
-    def __init__(self, name, email, invalid_matches):
+    def __init__(self, name, email, invalid_receivers):
         self.name = name
         self.email = email
-        self.invalid_matches = invalid_matches
+        self.invalid_receivers = invalid_receivers
     
     def __str__(self):
         return "%s <%s>" % (self.name, self.email)
@@ -69,7 +69,7 @@ def parse_yaml(yaml_path=CONFIG_PATH):
 def choose_receiver(giver, receivers):
     random.shuffle(receivers)
     for receiver in receivers:
-        if receiver.name not in giver.invalid_matches and giver != receiver:
+        if receiver.name not in giver.invalid_receivers and giver != receiver:
             return receiver
     raise Exception("No receiver found for %s." % giver.name)
 
@@ -112,17 +112,14 @@ def main(argv=None):
         for person in participants:
             name, email = re.match(r'([^<]*)<([^>]*)>', person).groups()
             name = name.strip()
-            invalid_matches = []
+            invalid_receivers = []
             for pair in dont_pair:
-                names = [n.strip() for n in pair.split(',')]
-                if name in names:
-                    # is part of this pair
-                    for member in names:
-                        if name != member:
-                            invalid_matches.append(member)
-            person = Person(name, email, invalid_matches)
+                names = [n.strip() for n in pair.split('->')]
+                if names[0] == name:
+                    invalid_receivers.append(names[1])
+            person = Person(name, email, invalid_receivers)
             givers.append(person)
-        
+        print(givers) 
         receivers = givers[:]
         pairs = create_pairs(givers, receivers)
         if not send:
