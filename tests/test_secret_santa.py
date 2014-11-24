@@ -1,6 +1,6 @@
 from unittest import TestCase
 import os
-from secret_santa import parse_yaml, choose_receiver, Person
+from secret_santa import parse_yaml, choose_receiver, Person, create_pairs
 
 class TestSecretSanta(TestCase):
 
@@ -44,3 +44,13 @@ class TestSecretSanta(TestCase):
 
         self.assertTrue(uschi_received, "Uschi never received anything.")
         self.assertTrue(frank_received, "Frank never received anything.")
+
+    def test_blocks_work_one_way_only(self):
+        hans  = Person('Hans', 'hans@email.com', 'Uschi')
+        uschi = Person('Uschi', 'uschi@email.com', 'Frank')
+        frank = Person('Frank', 'frank@email.com', 'Hans')
+        people = [hans, uschi, frank]
+        pairs = create_pairs(people, people)
+        print([str(pair) for pair in pairs])
+        
+

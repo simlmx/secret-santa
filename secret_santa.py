@@ -107,7 +107,6 @@ def main(argv=None):
         dont_pair = config['DONT_PAIR']
         if len(participants) < 2:
             raise Exception('Not enough participants specified.')
-        
         givers = []
         for person in participants:
             name, email = re.match(r'([^<]*)<([^>]*)>', person).groups()
@@ -119,9 +118,7 @@ def main(argv=None):
                     invalid_receivers.append(names[1])
             person = Person(name, email, invalid_receivers)
             givers.append(person)
-        print(givers) 
-        receivers = givers[:]
-        pairs = create_pairs(givers, receivers)
+        pairs = create_pairs(givers, givers)
         if not send:
             print( """Test pairings:\n\n%s\n\nTo send out emails with new pairings,
 call with the --send argument:\n\n$ python secret_santa.py --send""" % ("\n".join([str(p) for p in pairs])))
