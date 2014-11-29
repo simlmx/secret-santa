@@ -118,7 +118,7 @@ def main(argv=None):
                     invalid_receivers.append(names[1])
             person = Person(name, email, invalid_receivers)
             givers.append(person)
-        pairs = create_pairs(givers, givers)
+        pairs = create_pairs(givers, givers.copy())
         if not send:
             print( """Test pairings:\n\n%s\n\nTo send out emails with new pairings,
 call with the --send argument:\n\n$ python secret_santa.py --send""" % ("\n".join([str(p) for p in pairs])))

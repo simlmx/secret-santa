@@ -50,7 +50,14 @@ class TestSecretSanta(TestCase):
         uschi = Person('Uschi', 'uschi@email.com', 'Frank')
         frank = Person('Frank', 'frank@email.com', 'Hans')
         people = [hans, uschi, frank]
-        pairs = create_pairs(people, people)
-        print([str(pair) for pair in pairs])
+        pairs = create_pairs(people, people.copy())
+        for pair in pairs:
+            if pair.giver == hans:
+                self.assertEqual(pair.receiver, frank)
+            if pair.giver == uschi:
+                self.assertEqual(pair.receiver, hans)
+            if pair.giver == frank:
+                self.assertEqual(pair.receiver, uschi)
+
         
 
