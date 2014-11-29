@@ -47,7 +47,7 @@ Subject: {subject}
 CONFIG_PATH = os.path.join(os.path.dirname(__file__), 'config.yml')
 
 class Person:
-    def __init__(self, name, email, invalid_receivers):
+    def __init__(self, name, email, invalid_receivers=[]):
         self.name = name
         self.email = email
         self.invalid_receivers = invalid_receivers
@@ -62,9 +62,6 @@ class Pair:
     
     def __str__(self):
         return "%s ---> %s" % (self.giver.name, self.receiver.name)
-
-def parse_yaml(yaml_path=CONFIG_PATH):
-    return yaml.load(open(yaml_path))    
 
 def choose_receiver(giver, receivers):
     random.shuffle(receivers)
@@ -98,7 +95,7 @@ def main(argv=None):
             if option in ("-h", "--help"):
                 print(help_message)
                 
-        config = parse_yaml()
+        config = yaml.load(open(CONFIG_PATH))
         for key in REQRD:
             if key not in config.keys():
                 raise Exception('Required parameter %s not in yaml config file!' % key)

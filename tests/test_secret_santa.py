@@ -59,5 +59,14 @@ class TestSecretSanta(TestCase):
             if pair.giver == frank:
                 self.assertEqual(pair.receiver, uschi)
 
+    def test_creates_right_number_of_pairs(self):
+        hans  = Person('Hans', 'hans@email.com', 'Uschi')
+        uschi = Person('Uschi', 'uschi@email.com', 'Frank')
+        frank = Person('Frank', 'frank@email.com', 'Hans')
+        arndt = Person('Arndt', 'arndt@email.com')
+        antje = Person('Antje', 'antje@email.com')
+        people = [hans, uschi, frank, arndt, antje]
+        pairs = create_pairs(people, people.copy())
+        self.assertEqual(len(pairs), len(people))
         
 
