@@ -1,9 +1,6 @@
 # Required to connect to your outgoing mail server. Example for using gmail:
-# gmail
 SMTP_SERVER: smtp.gmail.com
 SMTP_PORT: 587
-USERNAME: you@gmail.com
-PASSWORD: "your-password"
 
 TIMEZONE: 'US/Pacific'
 

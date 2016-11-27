@@ -3,6 +3,7 @@
 import yaml # sudo pip install pyyaml
 import re
 import random
+import getpass
 import smtplib
 import datetime
 import pytz
@@ -23,15 +24,13 @@ For more information, see README.
 '''
 
 REQRD = (
-    'SMTP_SERVER', 
-    'SMTP_PORT', 
-    'USERNAME', 
-    'PASSWORD', 
-    'TIMEZONE', 
-    'PARTICIPANTS', 
-    'DONT_PAIR', 
-    'FROM', 
-    'SUBJECT', 
+    'SMTP_SERVER',
+    'SMTP_PORT',
+    'TIMEZONE',
+    'PARTICIPANTS',
+    'DONT_PAIR',
+    'FROM',
+    'SUBJECT',
     'MESSAGE',
 )
 
@@ -51,7 +50,7 @@ class Person:
         self.name = name
         self.email = email
         self.invalid_receivers = invalid_receivers
-    
+
     def __str__(self):
         return "%s <%s>" % (self.name, self.email)
 
@@ -59,7 +58,7 @@ class Pair:
     def __init__(self, giver, receiver):
         self.giver = giver
         self.receiver = receiver
-    
+
     def __str__(self):
         return "%s ---> %s" % (self.giver.name, self.receiver.name)
 
@@ -86,7 +85,7 @@ def main(argv=None):
             opts, args = getopt.getopt(argv[1:], "shc", ["send", "help"])
         except getopt.error as msg:
             raise Exception(msg)
-    
+
         # option processing
         send = False
         for option, value in opts:
@@ -94,7 +93,7 @@ def main(argv=None):
                 send = True
             if option in ("-h", "--help"):
                 print(help_message)
-                
+
         config = yaml.load(open(CONFIG_PATH))
         for key in REQRD:
             if key not in config.keys():
@@ -119,11 +118,11 @@ def main(argv=None):
         if not send:
             print( """Test pairings:\n\n%s\n\nTo send out emails with new pairings,
 call with the --send argument:\n\n$ python secret_santa.py --send""" % ("\n".join([str(p) for p in pairs])))
-        
+
         if send:
             server = smtplib.SMTP(config['SMTP_SERVER'], config['SMTP_PORT'])
             server.starttls()
-            server.login(config['USERNAME'], config['PASSWORD'])
+            server.login(input('Username for {}: '.format(config['SMTP_SERVER'])), getpass.getpass())
         for pair in pairs:
             zone = pytz.timezone(config['TIMEZONE'])
             now = zone.localize(datetime.datetime.now())
@@ -133,10 +132,10 @@ call with the --send argument:\n\n$ python secret_santa.py --send""" % ("\n".joi
             to = pair.giver.email
             subject = config['SUBJECT'].format(santa=pair.giver.name, santee=pair.receiver.name)
             body = (HEADER+config['MESSAGE']).format(
-                date=date, 
-                message_id=message_id, 
-                frm=frm, 
-                to=to, 
+                date=date,
+                message_id=message_id,
+                frm=frm,
+                to=to,
                 subject=subject,
                 santa=pair.giver.name,
                 santee=pair.receiver.name,
@@ -147,7 +146,7 @@ call with the --send argument:\n\n$ python secret_santa.py --send""" % ("\n".joi
 
         if send:
             server.quit()
-        
+
     except Exception as e:
         print("ERROR: ", e)
         print( "For help, use --help")
