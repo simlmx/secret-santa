@@ -1,20 +1,18 @@
 #!/usr/bin/env python3
 
-import yaml # sudo pip install pyyaml
+import yaml
 import re
 import random
 import getpass
 import smtplib
-import datetime
-import pytz
-import time
-import socket
 import sys
 import getopt
 import os
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 
 help_message = '''
-To use, fill out config.yml with your own participants. You can also specify 
+To use, fill out config.yml with your own participants. You can also specify
 DONT_PAIR so that people don't get assigned their significant other.
 
 You'll also need to specify your mail server settings. An example is provided
@@ -34,16 +32,9 @@ REQRD = (
     'MESSAGE',
 )
 
-HEADER = """Date: {date}
-Content-Type: text/plain; charset="utf-8"
-Message-Id: {message_id}
-From: {frm}
-To: {to}
-Subject: {subject}
-        
-"""
 
 CONFIG_PATH = os.path.join(os.path.dirname(__file__), 'config.yml')
+
 
 class Person:
     def __init__(self, name, email, invalid_receivers=[]):
@@ -54,6 +45,7 @@ class Person:
     def __str__(self):
         return "%s <%s>" % (self.name, self.email)
 
+
 class Pair:
     def __init__(self, giver, receiver):
         self.giver = giver
@@ -62,12 +54,14 @@ class Pair:
     def __str__(self):
         return "%s ---> %s" % (self.giver.name, self.receiver.name)
 
+
 def choose_receiver(giver, receivers):
     random.shuffle(receivers)
     for receiver in receivers:
         if receiver.name not in giver.invalid_receivers and giver != receiver:
             return receiver
     raise Exception("No receiver found for %s." % giver.name)
+
 
 def create_pairs(givers, receivers):
     pairs = []
@@ -76,6 +70,7 @@ def create_pairs(givers, receivers):
         pairs.append(Pair(giver, receiver))
         receivers.remove(receiver)
     return pairs
+
 
 def main(argv=None):
     if argv is None:
@@ -115,8 +110,9 @@ def main(argv=None):
             person = Person(name, email, invalid_receivers)
             givers.append(person)
         pairs = create_pairs(givers, givers.copy())
+
         if not send:
-            print( """Test pairings:\n\n%s\n\nTo send out emails with new pairings,
+            print("""Test pairings:\n\n%s\n\nTo send out emails with new pairings,
 call with the --send argument:\n\n$ python secret_santa.py --send""" % ("\n".join([str(p) for p in pairs])))
 
         if send:
@@ -124,32 +120,34 @@ call with the --send argument:\n\n$ python secret_santa.py --send""" % ("\n".joi
             server.starttls()
             server.login(input('Username for {}: '.format(config['SMTP_SERVER'])), getpass.getpass())
         for pair in pairs:
-            zone = pytz.timezone(config['TIMEZONE'])
-            now = zone.localize(datetime.datetime.now())
-            date = now.strftime('%a, %d %b %Y %T %Z') # Sun, 21 Dec 2008 06:25:23 +0000
-            message_id = '<%s@%s>' % (str(time.time())+str(random.random()), socket.gethostname())
+            # zone = pytz.timezone(config['TIMEZONE'])
+            # now = zone.localize(datetime.datetime.now())
+            # date = now.strftime('%a, %d %b %Y %T %Z') # Sun, 21 Dec 2008 06:25:23 +0000
+            # message_id = '<%s@%s>' % (str(time.time())+str(random.random()), socket.gethostname())
             frm = config['FROM']
             to = pair.giver.email
             subject = config['SUBJECT'].format(santa=pair.giver.name, santee=pair.receiver.name)
-            body = (HEADER + '\n' + config['MESSAGE']).format(
-                date=date,
-                message_id=message_id,
-                frm=frm,
-                to=to,
-                subject=subject,
+            body = config['MESSAGE'].format(
                 santa=pair.giver.name,
                 santee=pair.receiver.name,
             )
+
+            msg = MIMEMultipart('alternative')
+            msg.set_charset('utf8')
+            _attach = MIMEText(body.encode('utf-8'), 'html', 'UTF-8')
+            msg.attach(_attach)
+            msg['Subject'] = subject
+
             if send:
-                result = server.sendmail(frm, [to], body)
-                print( "Emailed %s <%s>" % (pair.giver.name, to))
+                server.sendmail(frm, [to], msg.as_string())
+                print("Emailed %s <%s>" % (pair.giver.name, to))
 
         if send:
             server.quit()
 
     except Exception as e:
         print("ERROR: ", e)
-        print( "For help, use --help")
+        print("For help, use --help")
         return 2
 
 

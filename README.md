@@ -32,3 +32,9 @@ participants.
 To send the emails, call using the `--send` argument
 
     ./secret_santa.py --send
+
+Todos for next year
+-------------------
+
+Make sure the santa forms a chain, e.g. a -> b -> c -> d instead of
+a -> b -> a, c -> d -> d. It's always more fun that way!
