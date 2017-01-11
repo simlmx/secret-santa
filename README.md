@@ -36,5 +36,5 @@ To send the emails, call using the `--send` argument
 Todos for next year
 -------------------
 
-Make sure the santa forms a chain, e.g. a -> b -> c -> d instead of
+Make sure the santas form a chain, e.g. a -> b -> c -> d -> a instead of
 a -> b -> a, c -> d -> d. It's always more fun that way!
